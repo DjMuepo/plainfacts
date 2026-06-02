@@ -1,0 +1,17 @@
+PlainFacts completed MVP deploy steps
+
+1) Upload/copy these files to /home/ubuntu/plainfacts-deploy on Lightsail.
+2) From that folder run:
+   docker compose down
+   docker compose up -d --build
+3) Verify:
+   docker compose ps
+   curl http://localhost:8001/health
+4) Open:
+   http://52.88.71.74/
+   http://52.88.71.74/global.html
+   http://52.88.71.74/domestic.html
+   http://52.88.71.74/economy.html
+   http://52.88.71.74/markets.html
+
+This MVP includes: home, global/domestic/economy pages, image cards, article pages, search, markets placeholder/news feed, contact/share/account placeholders, FastAPI RSS backend, Docker/Nginx deployment.
