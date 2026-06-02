@@ -1,0 +1,32 @@
+services:
+
+  api:
+
+    build:
+
+      context: .
+
+      dockerfile: Dockerfile.api
+
+    ports:
+
+      - "8001:8000"
+
+
+
+  web:
+
+    build:
+
+      context: .
+
+      dockerfile: Dockerfile.web
+
+    ports:
+
+      - "80:80"
+
+    depends_on:
+
+      - api
+
