@@ -4,7 +4,13 @@ function esc(v){ return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","
 async function jget(path){ const res = await fetch(`${API}${path}`, {cache:"no-store"}); if(!res.ok) throw new Error(await res.text()); return res.json(); }
 function articleCard(item){
   const id = encodeURIComponent(item.id || "");
-  const img = item.image ? `<img class="thumb" src="${esc(item.image)}" alt="">` : "";
+  const img = item.image
+ ? `<img class="thumb"
+      src="${esc(item.image)}"
+      alt=""
+      loading="lazy"
+      onerror="this.outerHTML='<div class=&quot;imageFallback&quot;>PlainFacts</div>'">`
+ : `<div class="imageFallback">PlainFacts</div>`;
   return `<article class="article">${img}<div class="badge">Importance: ${esc(item.importance_score || "—")}</div><h3>${esc(item.title || item.topic_title || "Untitled")}</h3><p>${esc(item.summary || item.what || "")}</p><button onclick="location.href='/article.html?id=${id}'">Read →</button></article>`;
 }
 function unique(items, useGlobal=true){
