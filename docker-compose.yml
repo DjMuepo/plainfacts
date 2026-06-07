@@ -1,32 +1,19 @@
 services:
-
   api:
-
     build:
-
       context: .
-
       dockerfile: Dockerfile.api
-
     ports:
-
       - "8001:8000"
 
-
-
   web:
-
     build:
-
       context: .
-
       dockerfile: Dockerfile.web
-
     ports:
-
       - "80:80"
-
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
-
       - api
-
