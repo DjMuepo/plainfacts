@@ -309,5 +309,55 @@ def reload_feeds():
     load_feeds(force=True)
     return {"ok": True, "articles": len(FEED_CACHE), "time_utc": now_utc()}
 
+NEWSLETTER_SIGNUPS: List[Dict[str, Any]] = []
+USER_REPORTS: List[Dict[str, Any]] = []
+
+
+@app.post("/newsletter")
+def newsletter_signup(payload: Dict[str, Any]):
+    email = clean_text(payload.get("email", ""))
+    topics = payload.get("topics", [])
+
+    if "@" not in email:
+        return {"ok": False, "error": "Valid email required"}
+
+    signup = {
+        "email": email,
+        "topics": topics if isinstance(topics, list) else [],
+        "created_at": now_utc(),
+    }
+
+    NEWSLETTER_SIGNUPS.append(signup)
+    return {"ok": True, "message": "Newsletter signup saved"}
+
+
+@app.post("/report")
+def report_issue(payload: Dict[str, Any]):
+    report = {
+        "type": clean_text(payload.get("type", "general")),
+        "message": clean_text(payload.get("message", "")),
+        "article_id": clean_text(payload.get("article_id", "")),
+        "url": clean_text(payload.get("url", "")),
+        "created_at": now_utc(),
+    }
+
+    USER_REPORTS.append(report)
+    return {"ok": True, "message": "Report received"}
+
+
+@app.get("/admin/stats")
+def admin_stats():
+    data = articles()
+    return {
+        "ok": True,
+        "articles": len(data),
+        "global": len([x for x in data if x.get("category") == "global"]),
+        "domestic": len([x for x in data if x.get("category") == "domestic"]),
+        "economy": len([x for x in data if x.get("category") == "economy"]),
+        "newsletter_signups": len(NEWSLETTER_SIGNUPS),
+        "reports": len(USER_REPORTS),
+        "latest_reports": USER_REPORTS[-10:],
+        "latest_signups": NEWSLETTER_SIGNUPS[-10:],
+    }
 
 load_feeds(force=True)

@@ -39,3 +39,69 @@ async function loadMarkets(){
 }
 async function loadHome(){ state.used = new Set(); await loadCategory("global","globalFeed",3,true); await loadCategory("domestic","domesticFeed",3,true); await loadCategory("economy","economyFeed",3,true); await loadMarkets(); const u=document.getElementById("lastUpdated"); if(u) u.textContent = `Last updated: ${new Date().toLocaleTimeString()}`; }
 window.addEventListener("DOMContentLoaded", () => { const page = document.body.dataset.page || "home"; if(page==="home") loadHome(); if(page==="global") loadListPage("global"); if(page==="domestic") loadListPage("domestic"); if(page==="economy") loadListPage("economy"); if(page==="article") loadArticle(); if(page==="search") searchNews(); if(page==="markets") loadMarkets(); });
+
+async function signupNewsletter() {
+  const email = document.getElementById("email").value;
+
+  const topics = [...document.querySelectorAll('input[type="checkbox"]:checked')]
+    .map(x => x.value);
+
+  const res = await fetch("/api/newsletter", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email,
+      topics
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("result").innerText =
+    data.message || "Saved";
+}
+
+
+async function submitReport() {
+  const type = document.getElementById("type").value;
+  const message = document.getElementById("message").value;
+
+  const res = await fetch("/api/report", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      type,
+      message
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("result").innerText =
+    data.message || "Submitted";
+}
+
+
+async function loadAdminStats() {
+  const container = document.getElementById("adminStats");
+
+  if (!container) return;
+
+  const res = await fetch("/api/admin/stats");
+  const data = await res.json();
+
+  container.innerHTML = `
+    <h2>Articles: ${data.articles}</h2>
+    <h3>Global: ${data.global}</h3>
+    <h3>Domestic: ${data.domestic}</h3>
+    <h3>Economy: ${data.economy}</h3>
+    <h3>Newsletter Signups: ${data.newsletter_signups}</h3>
+    <h3>User Reports: ${data.reports}</h3>
+  `;
+}
+
+document.addEventListener("DOMContentLoaded", loadAdminStats);
